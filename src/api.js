@@ -1,6 +1,6 @@
 
 import {normalizeRoute,uaePoint} from './navigation.js';
-import {parseLocationInput,allowedMapUrl,buildingCodeQuery,mapFeatures} from './locations.js';
+import {parseLocationInput,allowedMapUrl,buildingCodeQuery,mapFeatures,mapAddresses} from './locations.js';
 async function json(url){let res;try{res=await fetch(url,{signal:AbortSignal.timeout(20000)});}catch(e){throw Error(e.name==='TimeoutError'?'The route service took too long. Try again.':'Connection failed. Check mobile data and try again.');}if(!res.ok)throw Error('The free map service is busy ('+res.status+'). Please try again later.');return res.json();}
 
 export async function searchPlaces(query){
@@ -11,6 +11,7 @@ export async function searchPlaces(query){
   const res=await fetch('/api/resolve-map-link',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:q}),signal:AbortSignal.timeout(20000)});
   const data=await res.json();if(!res.ok)throw Error(data.error||'Could not read that map link. Paste coordinates instead.');return[data.place];
  }
+ let addressResults=[];try{addressResults=mapAddresses(await json('/api/search-address?q='+encodeURIComponent(q)),q);}catch{} if(addressResults.length)return addressResults;
  const url=new URL('https://photon.komoot.io/api/');
  url.search=new URLSearchParams({q,limit:'20',lat:'25.2',lon:'55.27',bbox:'51,22,57,26.5'});
  let found=mapFeatures(await json(url),q);

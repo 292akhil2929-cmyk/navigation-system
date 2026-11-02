@@ -31,3 +31,7 @@ export function buildingCodeQuery(q){return q.replace(/\b([A-Za-z])[-\s]?(\d{2,3
 export function mapFeatures(data,q){
  const seen=[];return(data.features||[]).filter(f=>uaePoint(f.geometry?.coordinates)).map(f=>{const p=f.properties||{};return{name:p.name||[p.housenumber,p.street].filter(Boolean).join(' ')||q,detail:[p.housenumber,p.street,p.district,p.city,p.state].filter((s,i,a)=>s&&a.indexOf(s)===i).join(' · ')||'United Arab Emirates',coords:f.geometry.coordinates,source:'OpenStreetMap',type:p.osm_value||''};}).filter(p=>{if(seen.some(s=>s.name===p.name&&distance(s.coords,p.coords)<100))return false;seen.push(p);return true;});
 }
+
+export function mapAddresses(data,q){
+ return(data.places||[]).map(p=>({name:p.name||p.address?.building||p.address?.road||q,detail:p.display_name||'United Arab Emirates',coords:[Number(p.lon),Number(p.lat)],source:'Nominatim / OpenStreetMap'})).filter(p=>uaePoint(p.coords));
+}
