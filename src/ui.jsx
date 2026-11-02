@@ -1,0 +1,4 @@
+
+import * as Dialog from '@radix-ui/react-dialog';import * as Switch from '@radix-ui/react-switch';import {X} from 'lucide-react';
+export function Modal({open,onOpenChange,title,children}){return <Dialog.Root open={open} onOpenChange={onOpenChange}><Dialog.Portal><Dialog.Overlay className="modal-shade"/><Dialog.Content className="modal"><Dialog.Title>{title}</Dialog.Title><Dialog.Description className="sr-only">Navigation prototype settings and information.</Dialog.Description><Dialog.Close className="icon-button close" aria-label="Close dialog"><X size={20}/></Dialog.Close>{children}</Dialog.Content></Dialog.Portal></Dialog.Root>;}
+export function Toggle({label,checked,onChange}){return <label className="toggle-row"><span>{label}</span><Switch.Root className="switch" checked={checked} onCheckedChange={onChange}><Switch.Thumb className="thumb"/></Switch.Root></label>;}
