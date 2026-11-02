@@ -19,3 +19,12 @@
 - No external Bluetooth device or optical HUD has been tested.
 - No live traffic, exact lane detection, or full offline navigation is implemented.
 - Preparation timing is an experimental heuristic. This is a personal-testing prototype, not a validated driving aid.
+
+## Preview and search fix verification
+- 21 unit tests pass, including coordinate parsing, destination versus map-camera coordinates, URL allowlists, and building/street metadata.
+- On a 390×844 phone viewport, End preview moved from below the screen (top approximately 1,141px) to the persistent header (top approximately 14px).
+- Ending normal preview, ending HUD preview, and browser Back all return to the planner without leaving the app.
+- Imported coordinates generated a real route. A map click placed a selectable exact pin and loaded normal map tiles.
+- R02 International City Dubai returned R02 Building, Street 14, International City in the deployed interface.
+- Al Marjan Building Al Mankhool Dubai did not return a dependable exact open-data match. Full Google search parity remains unavailable.
+- Maps-link endpoint accepts explicit destination coordinates, blocks unsupported hosts, and rejects camera-centre-only links.

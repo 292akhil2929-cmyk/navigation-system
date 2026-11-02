@@ -40,3 +40,10 @@ npm test
 npm run build
 
 Source is authored through GitHub API and deployed from the GitHub commit to Vercel. No local application checkout is required.
+
+## Update: preview exit and building search
+Persistent End preview buttons are available in the normal and HUD views. Browser/Android Back exits the simulated session. Coordinate and map-pin selection allow destinations missing from the search index. Supported Google Maps coordinate links can be imported; camera-centre-only links are deliberately rejected.
+
+Address search now uses Nominatim first, then Photon. R02 Building in International City was verified in the deployed UI. Al Marjan Building in Al Mankhool was not reliably resolved; do not confuse it with another Marjan Building. This does not reproduce the Google Places database.
+
+Nominatim use is limited to user-triggered searches for one active personal tester: no autocomplete, a one-hour in-memory result cache, and at least 1.2 seconds between upstream requests per function instance. This is NOT a shared global rate limiter; do not open multi-user/public-scale testing until a supported service and global limiter are installed. Provider URL is configurable with NOMINATIM_SEARCH_URL. See https://operations.osmfoundation.org/policies/nominatim/ . Address queries pass through Vercel, may appear in hosting logs, and are temporarily cached; no GPS tracking history is stored. Maps-link requests pass through Vercel and Google short-link redirects only; Google pages are not scraped.
