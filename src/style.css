@@ -47,3 +47,24 @@
 .pin-name{width:100%;background:#101713;border:1px solid #65725c;border-radius:7px;padding:12px;color:#eff5e6;font-size:12px;min-height:44px}
 .modal .save-note{font-size:11px;margin:0 0 15px}
 .modal .toggle-row{padding-bottom:6px}
+
+.search-form{position:relative;z-index:30}
+.suggestion-panel{position:absolute;z-index:700;left:0;right:0;top:calc(100% + 7px);border:1px solid #59684d;border-radius:10px;background:#18211b;box-shadow:0 15px 40px #0008;overflow:hidden}
+.suggestion-heading{font:9px var(--mono);letter-spacing:.06em;padding:12px 13px;color:var(--lime);border-bottom:1px solid var(--line)}
+.suggestion-panel [role=listbox]{max-height:280px;overflow-y:auto;overscroll-behavior:contain}
+.search-form .suggestion{display:flex;align-items:flex-start;justify-content:flex-start;gap:10px;width:100%;height:auto;min-height:57px;background:transparent;color:#edf3e6;border-radius:0;text-align:left;padding:11px 13px;border-bottom:1px solid #303e2b;white-space:normal;touch-action:pan-y}
+.search-form .suggestion:hover,.search-form .suggestion.highlighted{background:#34432a}
+.suggestion>svg{margin-top:2px;color:var(--lime);flex-shrink:0}
+.suggestion>span{min-width:0}
+.suggestion strong{display:block;font-size:12px;font-weight:500;line-height:1.5;overflow-wrap:anywhere}
+.suggestion small{display:block;color:#b2bea8;font-size:10px;line-height:1.6;margin-top:4px;overflow-wrap:anywhere}
+.suggestion-empty{font-size:11px;color:#c1ccb7;padding:15px;line-height:1.7}
+.suggestion-foot{font-size:9px;line-height:1.6;color:var(--muted);padding:11px 13px;border-top:1px solid var(--line)}
+.gps-route-button{margin-top:20px}
+.route-itinerary{border:1px solid var(--line);border-radius:7px;margin:12px 0;background:#172019}
+.route-itinerary summary{cursor:pointer;padding:14px;font-size:12px;font-weight:500;min-height:45px;color:var(--lime)}
+.route-itinerary ol{padding:0 13px;list-style:none;max-height:340px;overflow:auto;margin:0;overscroll-behavior:contain}
+.route-itinerary li{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--line);font-size:12px}
+.step-index{font:10px var(--mono);color:var(--muted);min-width:18px;padding-top:3px}
+.route-itinerary strong{display:block;font-weight:500;line-height:1.6}
+.route-itinerary small{display:block;color:var(--muted);margin-top:5px;line-height:1.6}
