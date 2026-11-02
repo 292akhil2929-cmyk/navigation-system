@@ -34,3 +34,10 @@
 - R02 International City Dubai returns R02 Building as a name/address match, with its complete available address and source visible on the phone layout.
 - A disposable named test pin was saved through the UI and retained after reload. Exact saved-name search resolves locally; the test pin is removed after verification.
 - Full Google search parity is not claimed. Al Marjan in Al Mankhool remains dependent on open-data availability or a user-verified pin.
+
+## Live suggestions and full-route update
+- 33 tests cover routing, search ranking, saved pins, suggestion prefix matching, code preservation, and ensuring automatic suggestions use Photon rather than Nominatim.
+- On a 390×844 phone viewport, typing Dubai Mar without submitting showed live Photon suggestions. ArrowDown/Enter selected Dubai Marina Mall and exposed Find route from my GPS.
+- GPS shortcut displays the location disclosure before requesting permission. Real GPS acquisition and on-road behaviour remain unverified on physical Android hardware.
+- A real Dubai Mall → Dubai Marina Mall route showed approximately 21 km, all 11 directions, and the final arrival instruction in the expandable itinerary. No horizontal overflow was observed.
+- Suggestion requests are debounced, aborted on query changes, and stale responses are discarded by the hook. Full submitted searches remain separate.

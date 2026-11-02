@@ -15,3 +15,5 @@ test('missing routes fail clearly',()=>{assert.throws(()=>normalizeRoute({routes
 test('instructions retain exits and roundabout numbers',()=>{assert.match(instruction({exits:'39',maneuver:{type:'off ramp',modifier:'right'}}),/39/);assert.match(instruction({maneuver:{type:'roundabout',exit:3}}),/exit 3/);});
 
 test('early exit reminders never replace an intervening manoeuvre',()=>{const r=normalizeRoute(raw);r.steps.splice(1,0,{at:200,distance:800,maneuver:{type:'turn',modifier:'left'}});const g=guidance(r,100,30,60);assert.equal(g.prepare,false);assert.equal(g.next.maneuver.type,'turn');});
+
+test('straight manoeuvres use clear continue wording',()=>{assert.equal(instruction({maneuver:{type:'turn',modifier:'straight'}}),'Continue straight');});

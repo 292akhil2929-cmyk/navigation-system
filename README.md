@@ -1,54 +1,60 @@
 # MADA — road-first navigation
-Android Chrome phone prototype: real online routes, GPS progress, early exit/fork reminders, route simulation, and mirrored HUD display.
+Android Chrome prototype with online driving routes, GPS progress, early exit/fork reminders, live place suggestions, full directions, saved pins and a mirrored HUD.
 
-## Try it
-Open the Vercel URL in Android Chrome. Choose a start point (or grant precise location), choose a destination, and select Find route. Preview this route uses a real calculated route but **simulated movement**. Start GPS guidance uses live location and recalculates from your actual position if needed. Chrome menu → Add to home screen provides a standalone launch.
+## Use on Android
+1. Open the Vercel deployment in Chrome.
+2. Type at least three characters. Quick suggestions appear after a short pause; choose one by touch or with Arrow keys and Enter. Search submits a deeper search across both address indexes.
+3. Choose a destination and use **Find route from my GPS**, or set a start point manually.
+4. Allow precise location after the location disclosure. **Find route** calculates a complete route. **Full route** expands every direction.
+5. **Start GPS guidance** tracks position. **Preview this route** simulates movement along the real calculated route.
+6. HUD view supports mirroring. **End preview/guidance** and browser Back end the session.
 
-Keep the app foregrounded. Screen Wake Lock is requested where supported; check the screen-awake indicator. Background location is not supported reliably by this browser prototype. Test parked or with a passenger operating the phone before any on-road evaluation.
+Keep Chrome foregrounded. Screen Wake Lock is requested where available; it does not make browser background navigation reliable. Add to home screen is available through Chrome. Test the app parked or with a passenger before any on-road evaluation.
 
-## Implemented
-- Photon place search, bounded to UAE-region coordinates.
-- OSRM driving routes with manoeuvres, mapped lane hints when supplied.
-- GPS projection onto route geometry; stale/inaccurate location suppresses spoken guidance.
-- Off-route handling: three reliable deviating fixes trigger recalculation, at most once per 30 seconds.
-- Early exit/fork preparation: clamp(speed metres/second × configurable 30–100 seconds, 700 m, 3000 m). This is a heuristic, not a validated driving threshold.
-- Preview controls, optional speech, mirror display, fullscreen, accessible settings.
-- Unit tests run before each Vercel production build.
+## Search and destinations
+Quick suggestions use Photon and saved pins only. No autocomplete request is sent to Nominatim. Requests are debounced, cancelled on input changes, cached for five minutes, and limited to roughly one automatic Photon request per second per active browser.
 
-## Limits
-No live traffic, exact lane detection, full offline navigation, Bluetooth HUD hardware support, or automotive-grade optical projection. End-of-road and fork preparation cues are junction advice, not verified highway exit identification. Public routing/geocoding/map services are best-effort; this deployment is for small-scale personal testing, **not commercial production**. OSM data may omit exits, entrances, restrictions or lane information. Follow actual road signs. Avoid last-minute corrections; missed turns should be rerouted.
+Submitted search combines Nominatim and Photon, removes duplicate places and ranks name/address tokens. Partial matches are labelled. Building-code queries exclude other codes. Missing buildings can be selected on the map or imported from exact coordinates / supported Google Maps pin links. A camera-centre-only Maps link is not accepted as an exact destination.
 
-No country/tile download or service worker bulk caching. Internet is required. There is no pretend offline switch.
+Named pins are optionally saved on this device, searchable and removable. Exact saved-name queries resolve locally. No shared directory or GPS tracking-history database is maintained. Open-data coverage differs from Google Maps; there is no claim of complete or perfect results.
+
+## GPS and route behaviour
+- Uses precise browser Geolocation on HTTPS, subject to user permission and device reception.
+- Routes are calculated from a GPS start or a selected map location.
+- Full geometry and all manoeuvre steps are available.
+- Progress projects reliable GPS fixes onto nearby route segments.
+- Stale or inaccurate fixes suppress spoken guidance.
+- Three reliable off-route fixes trigger recalculation, at most once per 30 seconds.
+- Early preparation distance is clamp(speed in m/s × selected lead time, 700 m, 3000 m).
+- An early exit cue never hides an intervening manoeuvre.
+
+Preparation timing is experimental and is not a lane-change clearance. There is no live traffic, full offline routing, exact lane detection, Bluetooth HUD connection, or automotive-grade optical projection.
+
+## Personal-test infrastructure
+Routing uses the public OSRM demo at router.project-osrm.org. Map tiles are requested only for viewed areas from OpenStreetMap; no tile bulk download is implemented. Search uses Photon and Nominatim. These public services have no availability guarantee and must be replaced with supported/self-hosted infrastructure before commercial use.
+
+Nominatim is used only for submitted searches, not autocomplete. Address results are cached for one hour in server memory with at least 1.2 seconds between upstream requests per function instance. This is NOT a global shared limiter. Keep this to one active personal tester; multi-user testing requires a supported provider and shared rate limiter.
+Policy: https://operations.osmfoundation.org/policies/nominatim/
+Photon policy and features: https://github.com/komoot/photon
 
 ## Privacy
-No analytics, account, GPS history, server database or saved route. Only reminder settings are stored in localStorage. Route coordinates are sent directly to OSRM; search terms to Photon; viewed map tiles to OpenStreetMap. Hosting access logs may be maintained by Vercel. Location is requested only after an explanatory dialog and user action. Never commit credentials.
+Typing sends query text to Photon after a pause. Submitted searches pass through Vercel to Nominatim and directly to Photon. Search queries may appear in hosting logs and temporary caches. Route coordinates go directly to OSRM. Viewed map tiles go to OpenStreetMap. GPS progress is processed on the phone. Settings and explicitly saved named pins stay in browser storage. Short Maps links pass through Vercel to supported Google redirect endpoints only; Google pages are not scraped. No analytics are installed.
 
-## Providers and licences
-- Map data: [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL; visible map attribution retained.
-- Map renderer: Leaflet (BSD-2-Clause).
-- Routing: [OSRM](https://project-osrm.org/), public demo at router.project-osrm.org. Replace with supported/self-hosted infrastructure for commercial use.
-- Search: [Photon](https://github.com/komoot/photon), public demo at photon.komoot.io.
-- UI: Radix Dialog/Switch following shadcn component patterns, inspected through connected shadcn MCP (MIT).
-- Icons: Lucide (ISC); React (MIT); Vite (MIT).
-- Fonts: Space Grotesk, DM Sans, IBM Plex Mono via Google Fonts (SIL Open Font License).
+## Configuration
+VITE_ROUTING_URL: optional OSRM-compatible routing endpoint.
+NOMINATIM_SEARCH_URL: optional server-side compatible address-search endpoint.
+Do not commit credentials.
 
-Set VITE_ROUTING_URL to an OSRM-compatible endpoint to replace the routing service.
-
-## Checks
+## Development and checks
 npm install
 npm test
 npm run build
 
-Source is authored through GitHub API and deployed from the GitHub commit to Vercel. No local application checkout is required.
+Tests run before each Vercel build. Code changes are committed through GitHub and deployed from that source. See VERIFICATION.md for checks and physical-device limitations.
 
-## Update: preview exit and building search
-Persistent End preview buttons are available in the normal and HUD views. Browser/Android Back exits the simulated session. Coordinate and map-pin selection allow destinations missing from the search index. Supported Google Maps coordinate links can be imported; camera-centre-only links are deliberately rejected.
-
-Address search now uses Nominatim first, then Photon. R02 Building in International City was verified in the deployed UI. Al Marjan Building in Al Mankhool was not reliably resolved; do not confuse it with another Marjan Building. This does not reproduce the Google Places database.
-
-Nominatim use is limited to user-triggered searches for one active personal tester: no autocomplete, a one-hour in-memory result cache, and at least 1.2 seconds between upstream requests per function instance. This is NOT a shared global rate limiter; do not open multi-user/public-scale testing until a supported service and global limiter are installed. Provider URL is configurable with NOMINATIM_SEARCH_URL. See https://operations.osmfoundation.org/policies/nominatim/ . Address queries pass through Vercel, may appear in hosting logs, and are temporarily cached; no GPS tracking history is stored. Maps-link requests pass through Vercel and Google short-link redirects only; Google pages are not scraped.
-
-## Combined free search and personal pins
-Nominatim and Photon are now queried together on submitted searches, with a five-minute browser-memory search cache. Results are deduplicated, ranked by building name/address tokens, and labelled when partial. Explicit building codes exclude mismatched codes. Textual matches are not a guarantee of correct entrances or current business data. Names do not gain invented coordinates.
-
-Missing locations can be given a name and optionally saved on this device after choosing an exact map pin or importing coordinates. Saving is off by default. Saved pins are searchable, removable, and retained after reload; exact saved-name queries resolve locally. They are not uploaded as a shared listings database. Users should include neighbourhoods in saved names to distinguish buildings. The privacy settings describe this local storage.
+## Sources and licences
+- OpenStreetMap contributors: https://www.openstreetmap.org/copyright (ODbL), visible map attribution retained.
+- Leaflet (BSD-2-Clause), OSRM (BSD-2-Clause), Photon (Apache-2.0).
+- Radix Dialog/Switch following inspected shadcn patterns (MIT). Connected shadcn Command inspected for combobox structure; the small asynchronous suggestion list uses explicit combobox/listbox keyboard semantics.
+- Lucide icons (ISC), React/Vite (MIT).
+- Space Grotesk, DM Sans and IBM Plex Mono via Google Fonts (SIL Open Font License).
