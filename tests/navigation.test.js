@@ -13,3 +13,5 @@ test('route matcher avoids jumping to distant later sections',()=>{const r={coor
 test('UAE coordinate bounds reject non-finite and distant locations',()=>{assert.equal(uaePoint([55.27,25.2]),true);assert.equal(uaePoint([0,0]),false);assert.equal(uaePoint([NaN,25]),false);});
 test('missing routes fail clearly',()=>{assert.throws(()=>normalizeRoute({routes:[]}),/No drivable route/);});
 test('instructions retain exits and roundabout numbers',()=>{assert.match(instruction({exits:'39',maneuver:{type:'off ramp',modifier:'right'}}),/39/);assert.match(instruction({maneuver:{type:'roundabout',exit:3}}),/exit 3/);});
+
+test('early exit reminders never replace an intervening manoeuvre',()=>{const r=normalizeRoute(raw);r.steps.splice(1,0,{at:200,distance:800,maneuver:{type:'turn',modifier:'left'}});const g=guidance(r,100,30,60);assert.equal(g.prepare,false);assert.equal(g.next.maneuver.type,'turn');});

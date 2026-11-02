@@ -13,6 +13,8 @@ export default function App(){
  const [settingsOpen,setSettingsOpen]=useState(false),[privacy,setPrivacy]=useState(false),[pending,setPending]=useState(null),[hud,setHud]=useState(false),[mirror,setMirror]=useState(false),[paused,setPaused]=useState(false),[online,setOnline]=useState(navigator.onLine),[wake,setWake]=useState(false);
  const [settings,setSettings]=useState(()=>({lead:60,sound:false,...readSettings()}));
  const watch=useRef(null),wakeLock=useRef(null),progress=useRef(null),fix=useRef(null),badFixes=useRef(0),rerouting=useRef(false),lastReroute=useRef(0),spoken=useRef(''),liveRoute=useRef(null),modeRef=useRef('plan'),speedRef=useRef(0);
+ useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});},[mode,hud]);
+ useEffect(()=>{if(!settings.sound)window.speechSynthesis?.cancel();},[settings.sound]);
  const active=mode==='live'||mode==='preview';const stale=mode==='live'&&(!lastFix||now-lastFix>12000||accuracy>50);
  const g=route?guidance(route,at,speed,settings.lead):null;
  const shown=g?.prepare?g.exit:g?.next;const maneuverDistance=g?.prepare?g.toExit:g?.toNext;
@@ -47,7 +49,7 @@ export default function App(){
  const hudContent=route?<div className={'instrument '+(g?.prepare?'preparing':'')}><div className="instrument-top"><span className="eyebrow">{stale?'GPS UNCERTAIN':offRoute?'OFF ROUTE':mode==='arrived'||g?.arrived?'DESTINATION':g?.prepare?'PREPARE AHEAD':'NEXT MANOEUVRE'}</span><span className="instrument-dot"/></div>
  <div className="turn-line">{stale||offRoute?<Pause size={hud?115:80}/>:<Direction step={shown} size={hud?115:80}/>}<div className="turn-distance">{mode==='arrived'||g?.arrived?'Here':formatDistance(maneuverDistance)}</div></div>
  <h2>{stale?'Waiting for precise GPS':offRoute?'Rechecking your route':g?.arrived?'You have arrived':instruction(shown)}</h2>
- <p className="road-name">{shown?.name||shown?.ref||destination?.name}</p>
+ <p className="road-name">{g?.arrived?destination?.name:shown?.name||shown?.ref||'Follow the mapped road'}</p>
  {g?.prepare&&!stale&&!offRoute&&<p className="prepare-copy">Get into position when safe. Follow signs and check your surroundings.</p>}
  {!stale&&!offRoute&&<LaneHints step={shown}/>}
  <div className="instrument-bottom"><span>{mode==='preview'?'SIMULATED':mode==='live'?'GPS SPEED':'ROUTE PREVIEW'}<strong>{active?Math.round(speed*3.6):'—'}<small> km/h</small></strong></span><span>REMAINING<strong>{formatDistance(g?.remaining)}</strong></span></div>

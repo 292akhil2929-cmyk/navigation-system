@@ -27,7 +27,8 @@ export function guidance(route,at,speed=0,lead=60){
  const next=route.steps.find(s=>s.at>at+12)||route.steps.at(-1);
  const exit=route.steps.find(s=>isExit(s)&&s.at>at+30);
  const remaining=Math.max(0,route.total-at),arrived=remaining<35;
- const prep=exit&&exit.at-at<=prepareDistance(speed,lead);
+ // Never hide an intervening turn behind an early exit cue.
+ const prep=exit&&next===exit&&exit.at-at<=prepareDistance(speed,lead);
  return {next,exit,remaining,arrived,prepare:!!prep,toNext:Math.max(0,(next?.at||0)-at),toExit:exit?exit.at-at:null,phase:arrived?'arrived':prep?'prepare':'cruise'};
 }
 export function formatDistance(m){if(!Number.isFinite(m))return '—';return m>=1000?(m/1000).toFixed(m<10000?1:0)+' km':Math.max(0,Math.round(m/10)*10)+' m';}
