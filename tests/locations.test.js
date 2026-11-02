@@ -1,0 +1,11 @@
+
+import test from 'node:test';import assert from 'node:assert/strict';
+import {coordinatePlace,parseLocationInput,allowedMapUrl,buildingCodeQuery,mapFeatures} from '../src/locations.js';
+test('accept exact UAE coordinates in latitude-longitude order',()=>{assert.deepEqual(parseLocationInput('25.1972, 55.2797').coords,[55.2797,25.1972]);});
+test('reject reversed or out-of-region coordinates',()=>{assert.throws(()=>parseLocationInput('55.2797,25.1972'),/UAE/);assert.throws(()=>coordinatePlace(0,0),/UAE/);});
+test('read explicit Google Maps query coordinates',()=>{assert.deepEqual(parseLocationInput('https://www.google.com/maps/search/?api=1&query=25.1972%2C55.2797').coords,[55.2797,25.1972]);});
+test('Google destination coordinates take precedence over camera centre',()=>{const p=parseLocationInput('https://www.google.com/maps/place/Building/@25.1,55.1,14z/data=!3d25.25!4d55.3');assert.deepEqual(p.coords,[55.3,25.25]);});
+test('camera centres and place IDs are not silently treated as destinations',()=>{assert.equal(parseLocationInput('https://www.google.com/maps/place/Building/@25.1,55.1,14z'),null);assert.equal(parseLocationInput('https://www.google.com/maps/search/?api=1&query=Building&query_place_id=ChIJabc'),null);});
+test('resolve only explicitly allowed HTTPS map hosts',()=>{assert.ok(allowedMapUrl('https://maps.app.goo.gl/example'));for(const u of ['http://maps.app.goo.gl/example','https://google.com.evil.test/maps','https://localhost/maps','https://www.google.com:8443/maps','https://user:pass@www.google.com/maps','https://goo.gl/not-maps'])assert.equal(allowedMapUrl(u),null);});
+test('ordinary building names stay search queries',()=>{assert.equal(parseLocationInput('R02 International City'),null);assert.equal(buildingCodeQuery('r02 International City'),'R-02 International City');});
+test('results retain building numbers and streets and remove duplicates',()=>{const f={geometry:{coordinates:[55.3,25.25]},properties:{name:'Building',housenumber:'10a',street:'5A Street',district:'Al Mankhool',city:'Dubai'}};const p=mapFeatures({features:[f,f]},'building');assert.equal(p.length,1);assert.match(p[0].detail,/5A Street/);assert.match(p[0].detail,/Al Mankhool/);});
