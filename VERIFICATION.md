@@ -28,3 +28,9 @@
 - R02 International City Dubai returned R02 Building, Street 14, International City in the deployed interface.
 - Al Marjan Building Al Mankhool Dubai did not return a dependable exact open-data match. Full Google search parity remains unavailable.
 - Maps-link endpoint accepts explicit destination coordinates, blocks unsupported hosts, and rejects camera-centre-only links.
+
+## Combined-index update
+- 27 tests cover route logic, location imports, index deduplication, building-code exclusion, neighbourhood ranking, saved-pin validation, and coordinate-search isolation.
+- R02 International City Dubai returns R02 Building as a name/address match, with its complete available address and source visible on the phone layout.
+- A disposable named test pin was saved through the UI and retained after reload. Exact saved-name search resolves locally; the test pin is removed after verification.
+- Full Google search parity is not claimed. Al Marjan in Al Mankhool remains dependent on open-data availability or a user-verified pin.

@@ -45,7 +45,7 @@ export function normalizePlaceText(text){
 }
 const common=new Set(['al','the','building','bldg','dubai','uae','united','arab','emirates','street','st','road','rd']);
 export function rankPlaces(query,places){
- if(/^\s*(?:https:\/\/|-?\d+(?:\.\d+)?\s*[,;])/i.test(query))return places.filter(p=>uaePoint(p.coords)).map(p=>({...p,partial:false,score:100,sources:[p.source||'coordinates']}));
+ if(/^\s*(?:https:\/\/|-?\d+(?:\.\d+)?\s*[,;])/i.test(query))return places.filter(p=>uaePoint(p.coords)&&p.source==='coordinates').map(p=>({...p,partial:false,score:100,sources:[p.source||'coordinates']}));
  const full=normalizePlaceText(query),tokens=full.split(' ').filter(t=>t&&!common.has(t));
  const codes=[...full.matchAll(/\b[a-z]\d{2,3}\b/g)].map(m=>m[0]);
  const scored=[];
